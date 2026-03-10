@@ -3,7 +3,7 @@
 #   Use the official Go image as the build environment.
 #   The result is a statically linked Linux binary — no runtime dependencies.
 # ─────────────────────────────────────────────────────────────────────────────
-FROM golang:1.22-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 # Install git so `go mod download` can fetch modules over HTTPS.
 RUN apk add --no-cache git
