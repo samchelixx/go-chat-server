@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoChat — Sign In</title>
+  <meta name="description" content="A real-time chat application built with Go, WebSocket, and PostgreSQL." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/web/style.css" />
+</head>
+<body class="auth-page">
+
+  <div class="auth-container">
+    <div class="auth-card">
+      <!-- Logo / Brand -->
+      <div class="brand">
+        <div class="brand-icon">💬</div>
+        <h1 class="brand-name">GoChat</h1>
+        <p class="brand-tagline">Real-time chat, powered by Go</p>
+      </div>
+
+      <!-- Tab switcher -->
+      <div class="tab-switcher" role="tablist">
+        <button class="tab active" id="tab-login" role="tab" onclick="switchTab('login')">Sign In</button>
+        <button class="tab" id="tab-register" role="tab" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- Login form -->
+      <form id="form-login" class="auth-form" onsubmit="handleLogin(event)">
+        <div class="field-group" id="login-fields">
+          <label class="field-label" for="login-username">Username</label>
+          <input class="field-input" id="login-username" type="text"
+                 placeholder="your_username" autocomplete="username" required />
+
+          <label class="field-label" for="login-password">Password</label>
+          <input class="field-input" id="login-password" type="password"
+                 placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+        <p class="auth-error" id="login-error"></p>
+        <button class="btn-primary" type="submit" id="login-btn">
+          <span class="btn-text">Sign In</span>
+          <span class="btn-loader hidden">⟳</span>
+        </button>
+      </form>
+
+      <!-- Register form -->
+      <form id="form-register" class="auth-form hidden" onsubmit="handleRegister(event)">
+        <div class="field-group">
+          <label class="field-label" for="reg-username">Username</label>
+          <input class="field-input" id="reg-username" type="text"
+                 placeholder="choose a username" autocomplete="username" required minlength="3" maxlength="50" />
+
+          <label class="field-label" for="reg-password">Password</label>
+          <input class="field-input" id="reg-password" type="password"
+                 placeholder="at least 6 characters" autocomplete="new-password" required minlength="6" />
+        </div>
+        <p class="auth-error" id="register-error"></p>
+        <button class="btn-primary" type="submit" id="register-btn">
+          <span class="btn-text">Create Account</span>
+          <span class="btn-loader hidden">⟳</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Redirect to chat if already logged in
+    if (localStorage.getItem('token')) window.location.href = '/chat';
+
+    function switchTab(tab) {
+      document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
+      document.getElementById('form-register').classList.toggle('hidden', tab !== 'register');
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      await authRequest('/api/auth/login', {
+        username: document.getElementById('login-username').value.trim(),
+        password: document.getElementById('login-password').value,
+      }, 'login');
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      await authRequest('/api/auth/register', {
+        username: document.getElementById('reg-username').value.trim(),
+        password: document.getElementById('reg-password').value,
+      }, 'register');
+    }
+
+    async function authRequest(url, body, type) {
+      const errEl = document.getElementById(`${type}-error`);
+      const btn = document.getElementById(`${type}-btn`);
+      errEl.textContent = '';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Something went wrong');
+
+        // Store auth data and navigate to the chat page
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userID', data.user_id);
+        localStorage.setItem('username', data.username);
+        window.location.href = '/chat';
+      } catch (err) {
+        errEl.textContent = err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

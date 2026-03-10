@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoChat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/web/style.css" />
+</head>
+<body class="chat-page">
+
+  <!-- Sidebar: room list + user info -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="brand-icon-sm">💬</span>
+      <span class="brand-name-sm">GoChat</span>
+      <button class="btn-icon" id="logout-btn" title="Sign out" onclick="logout()">⎋</button>
+    </div>
+
+    <div class="user-info">
+      <div class="avatar" id="user-avatar">?</div>
+      <span class="username-display" id="username-display">…</span>
+    </div>
+
+    <div class="rooms-header">
+      <span>Rooms</span>
+      <button class="btn-new-room" id="new-room-btn" title="Create room" onclick="showNewRoomModal()">＋</button>
+    </div>
+
+    <ul class="room-list" id="room-list">
+      <li class="room-list-placeholder">Loading rooms…</li>
+    </ul>
+  </aside>
+
+  <!-- Main chat area -->
+  <main class="chat-main">
+    <!-- Top bar -->
+    <header class="chat-header">
+      <div>
+        <h2 class="room-title" id="room-title">Select a room</h2>
+        <span class="room-status" id="room-status">—</span>
+      </div>
+      <div class="conn-indicator" id="conn-indicator" title="Connection status"></div>
+    </header>
+
+    <!-- Messages -->
+    <div class="messages-area" id="messages-area">
+      <div class="messages-placeholder" id="messages-placeholder">
+        <div class="placeholder-icon">💬</div>
+        <p>Join a room to start chatting</p>
+      </div>
+    </div>
+
+    <!-- Message input -->
+    <footer class="message-input-bar" id="input-bar">
+      <input class="message-input" id="message-input" type="text"
+             placeholder="Type a message…" disabled
+             onkeydown="handleInputKey(event)" maxlength="4000" />
+      <button class="btn-send" id="send-btn" onclick="sendMessage()" disabled>
+        ➤
+      </button>
+    </footer>
+  </main>
+
+  <!-- New room modal -->
+  <div class="modal-overlay hidden" id="modal-overlay" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h3 class="modal-title">Create Room</h3>
+      <input class="field-input" id="new-room-name" type="text"
+             placeholder="Room name" maxlength="100"
+             onkeydown="if(event.key==='Enter') createRoom()" />
+      <p class="auth-error" id="room-error"></p>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" onclick="createRoom()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/web/app.js"></script>
+</body>
+</html>
